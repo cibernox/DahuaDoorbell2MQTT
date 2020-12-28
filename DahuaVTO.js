@@ -92,10 +92,20 @@ class DahuaVTO {
     this.getDeviceDetails().then(({ deviceType, serialNumber }) => {
       this.deviceType = deviceType;
       this.serialNumber = serialNumber;
+      this.start();
+    });
+  }
+
+  /**
+   * Starts the app by:
+   *    - Opening a TCP socket to the doorbell
+   *    - Connecting to the MQTT broker
+   *    - Authenticating with the doorbell and subscribing to events.
+   */
+  start() {
       this.setupDoorbellSocket();
       this.setupMQTT();
       this.initLogin();
-    });
   }
 
   /**
@@ -154,6 +164,8 @@ class DahuaVTO {
    * Setups the listener for when we receive data over that socket
    *
    * Also setups other listeners for logging purposes mostly.
+   *
+   * If something goes wrong, we close everything and try to start over again.
    */
   setupDoorbellSocket() {
     let socket = new net.Socket({ readable: true, writable: true });
@@ -170,6 +182,9 @@ class DahuaVTO {
     socket.on('data', this.receive.bind(this));
     socket.on('error', function (e) {
       console.error('Doorbell socket error', e);
+      this.doorbellSocket.destroy();
+      clearInterval(this._keepAliveTimer);
+      this.start(); // Start over again.
     });
     this.doorbellSocket = socket.connect({ port: 5000, host: this.dahua_host });
   }
