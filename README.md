@@ -7,13 +7,13 @@ Listens to events from Dahua VTO unit and publishes them via MQTT Message
 
 ## Environment Variables
 ```
-DAHUA_VTO_HOST: 			    Dahua VTO hostname or IP
-DAHUA_VTO_USERNAME: 		  Dahua VTO username to access (should be admin)
-DAHUA_VTO_PASSWORD: 		  Dahua VTO administrator password (same as accessing web management)
-MQTT_BROKER_HOST: 			  MQTT Broker hostname or IP
-MQTT_BROKER_PORT: 			  MQTT Broker port, default=1883
-MQTT_BROKER_USERNAME: 		MQTT Broker username
-MQTT_BROKER_PASSWORD: 		MQTT Broker password
+DAHUA_VTO_HOST:           Dahua VTO hostname or IP
+DAHUA_VTO_USERNAME:       Dahua VTO username to access (should be admin)
+DAHUA_VTO_PASSWORD:       Dahua VTO administrator password (same as accessing web management)
+MQTT_BROKER_HOST:         MQTT Broker hostname or IP
+MQTT_BROKER_PORT:         MQTT Broker port, default=1883
+MQTT_BROKER_USERNAME:     MQTT Broker username
+MQTT_BROKER_PASSWORD:     MQTT Broker password
 MQTT_BROKER_TOPIC_PREFIX: MQTT Broker topic prefix, default=DahuaVTO
 ```
 
