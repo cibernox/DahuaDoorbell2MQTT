@@ -1,5 +1,5 @@
 {
-  "name": "dahuavto2mqtt",
+  "name": "dahuadorbell2mqtt",
   "version": "1.0.0",
   "description": "JS Client to link DahuaVTO doorbell to MQTT",
   "main": "DahuaVTO.js",
