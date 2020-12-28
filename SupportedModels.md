@@ -1,0 +1,6 @@
+# Supported Models
+
+- VTO1220BW
+- VTO2111d-WP
+- VTO3211D-P2-S1
+- VTO2000A(-2)

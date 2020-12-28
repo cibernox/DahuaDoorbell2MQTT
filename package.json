@@ -1,0 +1,27 @@
+{
+  "name": "dahuavto2mqtt",
+  "version": "1.0.0",
+  "description": "JS Client to link DahuaVTO doorbell to MQTT",
+  "main": "DahuaVTO.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "none"
+  },
+  "keywords": [
+    "Dahua",
+    "VTO",
+    "MQTT",
+    "doorbell"
+  ],
+  "dependencies": {
+    "digest-fetch": "^1.1.5",
+    "md5": "^2.3.0",
+    "mqtt": "^4.2.6",
+    "node-fetch": "^2.6.1"
+  },
+  "author": "Miguel Camba",
+  "license": "ISC"
+}
