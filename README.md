@@ -26,26 +26,6 @@ Requirements:
 node DahuaVTO.js
 ```
 
-## Docker Compose
-```
-version: '2'
-services:
-  dahuavto2mqtt:
-    image: "eladbar/dahuavto2mqtt:latest"
-    container_name: "dahuavto2mqtt"
-    hostname: "dahuavto2mqtt"
-    restart: always
-    environment:
-      - DAHUA_VTO_HOST=vto-host
-      - DAHUA_VTO_USERNAME=Username
-      - DAHUA_VTO_PASSWORD=Password
-      - MQTT_BROKER_HOST=mqtt-host
-      - MQTT_BROKER_PORT=1883
-      - MQTT_BROKER_USERNAME=Username
-      - MQTT_BROKER_PASSWORD=Password
-      - MQTT_BROKER_TOPIC_PREFIX=DahuaVTO
-```
-
 ## Changelog
 
 * 2020-12-28: Initial version with Node.js
