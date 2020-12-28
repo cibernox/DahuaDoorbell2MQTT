@@ -1,4 +1,4 @@
-# Supported Models
+# Supported Doorbell Models
 
 - VTO1220BW
 - VTO2111d-WP
