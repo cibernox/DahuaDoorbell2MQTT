@@ -138,7 +138,7 @@ class DahuaVTO {
   /**
    * Saves a snapshot of the doorbells image into the given directory (defaults to /tmp/).
    *
-   * By default the file is named with a simple timestamp of the current time (YYYY-MM-DD-H-M-S.jpeg)
+   * By default the file is named with a simple timestamp of the current time (YYYY-MM-DD-H-M-S.jpg)
    *
    */
   saveSnapshot(p = "/tmp/") {
@@ -270,6 +270,11 @@ class DahuaVTO {
    *
    * The received messages are binary. Once discarded the first 32 bytes (the header),
    * the rest of the message is parsed as as a JSON string.
+   *
+   * The header contains the length of the received response in bytes 16..20 and the expected
+   * length of the response in bytes 24..28 in case we need it, but I haven't found a
+   * reason to. Perhaps responses might be sent in several chunks? So far it doesn't seem to be
+   * the case.
    *
    * Since we always make requests in the exact same order, we know the first two responses are
    * for the authentication.
