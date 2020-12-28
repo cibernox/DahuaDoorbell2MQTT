@@ -182,9 +182,10 @@ class DahuaVTO {
     socket.on('data', this.receive.bind(this));
     socket.on('error', function (e) {
       console.error('Doorbell socket error', e);
-      this.doorbellSocket.destroy();
-      clearInterval(this._keepAliveTimer);
-      this.start(); // Start over again.
+      this.doorbellSocket.destroy();        // destroy the socket
+      this.mqttClient.end(true);            // End the mqtt connection right away.
+      clearInterval(this._keepAliveTimer);  // Stop sending keepalive requests
+      this.start();                         // Start over again.
     });
     this.doorbellSocket = socket.connect({ port: 5000, host: this.dahua_host });
   }
