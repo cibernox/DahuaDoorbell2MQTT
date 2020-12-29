@@ -85,9 +85,7 @@ class DahuaVTO {
     this.mqtt_broker_username = process.env.MQTT_BROKER_USERNAME;
     this.mqtt_broker_password = process.env.MQTT_BROKER_PASSWORD;
     this.mqtt_broker_topic_prefix = process.env.MQTT_BROKER_TOPIC_PREFIX;
-    this.digestClient = new DigestFetch(this.dahua_username, this.dahua_password, {
-      logger: console,
-    });
+    this.digestClient = new DigestFetch(this.dahua_username, this.dahua_password);
 
     this.getDeviceDetails().then(({ deviceType, serialNumber }) => {
       this.deviceType = deviceType;
@@ -152,7 +150,7 @@ class DahuaVTO {
         if (err) {
           console.error('Error saving snapshot to disk', err);
         } else {
-          console.log('Snapshot saved');
+          console.info('Snapshot saved');
         }
       });
     });
@@ -169,9 +167,6 @@ class DahuaVTO {
    */
   setupDoorbellSocket() {
     let socket = new net.Socket({ readable: true, writable: true });
-    socket.on('connect', function () {
-      console.log('Doorbell socket connected');
-    });
     socket.on('end', function () {
       console.log('Doorbell socket ended');
     });
@@ -209,9 +204,6 @@ class DahuaVTO {
         payload: 'connected',
         qos: 1,
       },
-    });
-    this.mqttClient.on('connect', function (packet) {
-      console.log('MQTTConnect', packet);
     });
     this.mqttClient.on('disconnect', function (packet) {
       console.log('MQTTDisconnect', packet);
@@ -288,7 +280,6 @@ class DahuaVTO {
     } else if (this.requestId === 2) {
       this.handleSecondLoginPayload(obj);
     } else if (obj.method === 'client.notifyEventStream') {
-      console.log('Received even data', obj);
       this.handleEvents(obj.params.eventList);
     } else {
       this.handleGenericPayload(obj);
@@ -357,7 +348,7 @@ class DahuaVTO {
    */
   handleSecondLoginPayload(obj) {
     if (obj.result) {
-      console.log('Login successful.');
+      console.info('Logging to Dahua Doorbell successful');
       this.keepAliveInterval = obj.params.keepAliveInterval - 5;
       this.attachEventManager();
       this.keepConnectionAlive();
@@ -378,7 +369,7 @@ class DahuaVTO {
       obj.params &&
       Object.hasOwnProperty.call(obj.params, 'timeout')
     ) {
-      console.log('handleGenericPayload obj', obj);
+      console.info('Publish KeepAlive event');
       this.publishToMQTT('keepAlive', {
         deviceType: this.deviceType,
         serialNumber: this.serialNumber,
@@ -427,7 +418,7 @@ class DahuaVTO {
    */
   handleEvents(events) {
     events.forEach((event) => {
-      console.log(`Publish event ${event.Code} to MQTT`);
+      console.info(`Publish event ${event.Code} to MQTT`);
       this.publishToMQTT(event.Code, {
         Action: event.eventAction,
         Data: event.Data,
@@ -444,7 +435,6 @@ class DahuaVTO {
    */
   keepConnectionAlive(delay) {
     this._keepAliveTimer = setInterval(() => {
-      console.log('Sending a keepAlive message');
       let keepAlivePayload = {
         method: 'global.keepAlive',
         magic: '0x1234',
