@@ -4,6 +4,7 @@
   "description": "JS Client to link DahuaVTO doorbell to MQTT",
   "main": "DahuaVTO.js",
   "scripts": {
+    "start": "node DahuaVTO.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
