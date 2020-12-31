@@ -85,7 +85,10 @@ class DahuaVTO {
     this.mqtt_broker_username = process.env.MQTT_BROKER_USERNAME;
     this.mqtt_broker_password = process.env.MQTT_BROKER_PASSWORD;
     this.mqtt_broker_topic_prefix = process.env.MQTT_BROKER_TOPIC_PREFIX;
-    this.digestClient = new DigestFetch(this.dahua_username, this.dahua_password);
+    this.digestClient = new DigestFetch(
+      this.dahua_username,
+      this.dahua_password
+    );
 
     this.getDeviceDetails().then(({ deviceType, serialNumber }) => {
       this.deviceType = deviceType;
@@ -101,9 +104,9 @@ class DahuaVTO {
    *    - Authenticating with the doorbell and subscribing to events.
    */
   start() {
-      this.setupDoorbellSocket();
-      this.setupMQTT();
-      this.initLogin();
+    this.setupDoorbellSocket();
+    this.setupMQTT();
+    this.initLogin();
   }
 
   /**
@@ -132,28 +135,32 @@ class DahuaVTO {
       });
   }
 
-
   /**
    * Saves a snapshot of the doorbells image into the given directory (defaults to /tmp/).
    *
    * By default the file is named with a simple timestamp of the current time (YYYY-MM-DD-H-M-S.jpg)
    *
    */
-  saveSnapshot(p = "/tmp/") {
+  saveSnapshot(p = '/tmp/') {
     let now = new Date();
-    let dateStr = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`
+    let dateStr = `${now.getFullYear()}-${
+      now.getMonth() + 1
+    }-${now.getDate()}-${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
     let destination = path.join(p, `DoorBell_${dateStr}.jpg`);
-    this.digestClient.fetch(`http://${this.dahua_host}/cgi-bin/snapshot.cgi`).then(r => {
-      return r.buffer();
-    }).then(buf => {
-      fs.writeFile(destination, buf, 'binary', function(err) {
-        if (err) {
-          console.error('Error saving snapshot to disk', err);
-        } else {
-          console.info('Snapshot saved');
-        }
+    this.digestClient
+      .fetch(`http://${this.dahua_host}/cgi-bin/snapshot.cgi`)
+      .then((r) => {
+        return r.buffer();
+      })
+      .then((buf) => {
+        fs.writeFile(destination, buf, 'binary', function (err) {
+          if (err) {
+            console.error('Error saving snapshot to disk', err);
+          } else {
+            console.info('Snapshot saved');
+          }
+        });
       });
-    });
   }
 
   /**
@@ -177,10 +184,10 @@ class DahuaVTO {
     socket.on('data', this.receive.bind(this));
     socket.on('error', function (e) {
       console.error('Doorbell socket error', e);
-      this.doorbellSocket.destroy();        // destroy the socket
-      this.mqttClient.end(true);            // End the mqtt connection right away.
-      clearInterval(this._keepAliveTimer);  // Stop sending keepalive requests
-      this.start();                         // Start over again.
+      this.doorbellSocket.destroy(); // destroy the socket
+      this.mqttClient.end(true); // End the mqtt connection right away.
+      clearInterval(this._keepAliveTimer); // Stop sending keepalive requests
+      this.start(); // Start over again.
     });
     this.doorbellSocket = socket.connect({ port: 5000, host: this.dahua_host });
   }
@@ -321,7 +328,7 @@ class DahuaVTO {
     this.sessionId = session;
     let randomHash = this.genMD5Hash(random, realm);
     this.send({
-      id: 10000,       // I assume this ID a high number just because we have to send something.
+      id: 10000, // I assume this ID a high number just because we have to send something.
       magic: '0x1234', // No idea what this is
       method: 'global.login',
       session: this.sessionId,
@@ -449,6 +456,60 @@ class DahuaVTO {
       this.send(keepAlivePayload);
     }, this.keepAliveInterval * 1000);
   }
+
+  /**
+   * Remotely triggers the relay 1 (e.g. to open an electric gate).
+   *
+   * In my VTO 2202 F this also triggers the voice announcing the the door has been opened.
+   */
+  openDoor() {
+    return this.digestClient
+      .fetch(
+        `http://${this.dahua_host}/cgi-bin/accessControl.cgi?action=openDoor&channel=1&UserID=101&Type=Remote`
+      )
+      .then((r) => {
+        if (r.ok) {
+          console.info('Door relay triggered');
+        } else {
+          console.error('Error triggering the door relay', e);
+        }
+      })
+      .catch(e => console.error('Connection error triggering the door relay'));
+  }
+
+  // requestMissedCallsLog() {
+  //   this.send({
+  //     id: this.requestId,
+  //     magic: '0x1234',
+  //     method: 'RecordFinder.factory.create',
+  //     params: {
+  //       name: 'VideoTalkMissedLog',
+  //     },
+  //     session: this.sessionId,
+  //   });
+  // }
+
+  // requestMissedCallsLog2(findToken) {
+  //   this.send({
+  //     id: this.requestId,
+  //     magic: '0x1234',
+  //     method: 'RecordFinder.startFind',
+  //     object: findToken,
+  //     params: { condition: null },
+  //     session: this.sessionId,
+  //   });
+  // }
+
+  // requestMissedCallsLog3(findToken) {
+  //   this.send({
+  //     id: this.requestId,
+  //     magic: '0x1234',
+  //     method: 'RecordFinder.doFind',
+  //     object: findToken,
+  //     params: { count: 3 }, // Number of calls to show
+  //     session: this.sessionId,
+  //   });
+  // }
 };
 
 exports.default = DahuaVTO;
